@@ -21,16 +21,16 @@ for (const src of sourceDirs) {
     const folders = fs.readdirSync(src, { withFileTypes: true });
     for (const folder of folders) {
       if (folder.isDirectory()) {
-         const srcFolder = path.join(src, folder.name);
-         const destFolder = path.join(devHiveAgentsDir, folder.name);
-         try {
-           // Copy only if it doesn't already exist or overwrite safely
-           fs.cpSync(srcFolder, destFolder, { recursive: true, force: true });
-           console.log(`  └─ Copied: ${folder.name}`);
-           copiedCount++;
-         } catch (e) {
-           console.error(`  ❌ Failed to copy ${folder.name}: ${e.message}`);
-         }
+        const srcFolder = path.join(src, folder.name);
+        const destFolder = path.join(devHiveAgentsDir, folder.name);
+        try {
+          // Copy only if it doesn't already exist or overwrite safely
+          fs.cpSync(srcFolder, destFolder, { recursive: true, force: true });
+          console.log(`  └─ Copied: ${folder.name}`);
+          copiedCount++;
+        } catch (e) {
+          console.error(`  ❌ Failed to copy ${folder.name}: ${e.message}`);
+        }
       }
     }
   } else {

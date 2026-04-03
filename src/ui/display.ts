@@ -87,11 +87,11 @@ export function printBanner(agentCount?: number, model?: string): void {
   const white  = chalk.bold.hex(BEIGE);
 
   console.log('');
-  console.log(gold('  ╔═══ DevHive ') + gold('══════════════════════════════════════════╗'));
+  console.log(gold('  ╔════ DevHive ════════════════════════════════════════╗'));
   console.log(gold('  ║') + ' '.repeat(53) + gold('║'));
-  console.log(gold('  ║') + pale('          ✦  Welcome to DevHive  ✦        ').padEnd(53) + gold('║'));
+  console.log(gold('  ║') + pale('             ✦  Welcome to DevHive  ✦                ').padEnd(53) + gold('║'));
   console.log(gold('  ║') + ' '.repeat(53) + gold('║'));
-  // ASCII art — elegant gold block letters
+  // ASCII art — elegant gold block letters (53 chars wide exactly)
   const art = [
     ['██████╗ ███████╗██╗   ██╗', '██╗  ██╗██╗██╗   ██╗███████╗'],
     ['██╔══██╗██╔════╝██║   ██║', '██║  ██║██║██║   ██║██╔════╝'],
@@ -106,9 +106,19 @@ export function printBanner(agentCount?: number, model?: string): void {
     console.log(gold('  ║') + left + right + gold('║'));
   }
   console.log(gold('  ║') + ' '.repeat(53) + gold('║'));
-  console.log(gold('  ║') + dim('      Multi-Agent AI Engineering Platform  ').padEnd(53) + gold('║'));
+  console.log(gold('  ║') + dim('         Multi-Agent AI Engineering Platform         ').padEnd(53) + gold('║'));
   console.log(gold('  ║') + ' '.repeat(53) + gold('║'));
-  console.log(gold('  ╠') + gold('═══════════════════════════════════════════') + gold('╣'));
+  
+  // Socials section
+  console.log(gold('  ╟─────────────────────────────────────────────────────╢'));
+  console.log(gold('  ║') + ' '.repeat(53) + gold('║'));
+  console.log(gold('  ║') + chalk.hex(BEIGE_WARM)('  Email    : abdalrhamn.mahmoud@gmail.com').padEnd(53) + gold('║'));
+  console.log(gold('  ║') + chalk.hex(BEIGE_WARM)('  Facebook : https://www.facebook.com/share/1CMHZog6hZ/').padEnd(53) + gold('║'));
+  console.log(gold('  ║') + chalk.hex(BEIGE_WARM)('  Company  : https://www.facebook.com/share/1bvbFW6T99/').padEnd(53) + gold('║'));
+  console.log(gold('  ║') + ' '.repeat(53) + gold('║'));
+  
+  // Terminal Info
+  console.log(gold('  ╠═════════════════════════════════════════════════════╣'));
   console.log(gold('  ║') + white(`  ${username}`) + chalk.hex(MUTED)(` @ ${cwdDisplay}`).padEnd(53 - username.length) + gold('║'));
   if (model) {
     console.log(gold('  ║') + chalk.hex(BEIGE_WARM)(`  Model: ${model}`).padEnd(53) + gold('║'));
@@ -116,7 +126,7 @@ export function printBanner(agentCount?: number, model?: string): void {
   if (agentCount !== undefined) {
     console.log(gold('  ║') + chalk.hex(MUTED)(`  ${agentCount} agents loaded  ·  /help for commands`).padEnd(53) + gold('║'));
   }
-  console.log(gold('  ╚') + gold('═══════════════════════════════════════════') + gold('╝'));
+  console.log(gold('  ╚═════════════════════════════════════════════════════╝'));
   console.log('');
 }
 
