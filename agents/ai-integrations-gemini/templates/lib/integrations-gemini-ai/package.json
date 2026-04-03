@@ -1,0 +1,16 @@
+{
+  "name": "@workspace/integrations-gemini-ai",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./batch": "./src/batch/index.ts",
+    "./image": "./src/image/index.ts"
+  },
+  "dependencies": {
+    "@google/genai": "^1.44.0",
+    "p-limit": "^7.3.0",
+    "p-retry": "^7.1.1"
+  }
+}

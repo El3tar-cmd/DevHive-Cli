@@ -33,6 +33,7 @@ export async function runAgentTurn(
     agent.systemPrompt,
     skillContext ? `\n\n## Loaded Skills\n${skillContext}` : '',
     `\n\n## Environment\n- Working directory: ${process.cwd().replace(/\\/g, '/')}\n- Date: ${new Date().toISOString().split('T')[0]}\n- Agent: ${agent.name}\n- Model: ${model}`,
+    `\n\n## CRITICAL RULES FOR AI\n1. Do not halt execution just to converse. If you need to write code, call 'write_file' or 'edit_file' immediately.\n2. You must continuously issue tool calls in every response until your task is fully complete. Outputting pure text WITHOUT a tool call will immediately terminate your session.\n3. Do not ask for permission if you have sufficient context; act autonomously.`,
   ].join('');
 
   const systemMessage: Message = { role: 'system', content: systemContent };

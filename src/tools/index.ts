@@ -1,11 +1,12 @@
 import { Tool } from './types';
-import { readFileTool, writeFileTool, listFilesTool, createDirTool, deleteFileTool } from './file';
+import { readFileTool, writeFileTool, editFileTool, listFilesTool, createDirTool, deleteFileTool } from './file';
 import { runShellTool } from './shell';
 import { webFetchTool } from './web';
 
 export const ALL_TOOLS: Record<string, Tool> = {
   read_file: readFileTool,
   write_file: writeFileTool,
+  edit_file: editFileTool,
   list_files: listFilesTool,
   create_dir: createDirTool,
   delete_file: deleteFileTool,

@@ -11,6 +11,7 @@ export const ALL_TOOL_NAMES = [
   'delete_file',
   'run_shell',
   'web_fetch',
+  'edit_file',
 ];
 
 export interface AgentDefinition {
@@ -33,36 +34,60 @@ export function loadAgents(force = false): AgentDefinition[] {
   const seen = new Set<string>();
   const errors: string[] = [];
 
+
+  function processFile(filePath: string, file: string) {
+    try {
+      const raw = fs.readFileSync(filePath, 'utf-8');
+      const { data, content } = matter(raw);
+      
+      let name: string = data.name as string;
+      if (!name) {
+        if (file === 'AGENT.md' || file === 'SKILL.md') name = path.basename(path.dirname(filePath));
+        else name = path.basename(file, '.md');
+      }
+      
+      if (seen.has(name)) return;
+      seen.add(name);
+
+      const rawTools = data.tools;
+      const tools: string[] = Array.isArray(rawTools)
+        ? (rawTools as unknown[]).filter((t): t is string => typeof t === 'string' && ALL_TOOL_NAMES.includes(t))
+        : ALL_TOOL_NAMES;
+
+      agents.push({
+        name,
+        description: (data.description as string) || '',
+        tools,
+        model: data.model as string | undefined,
+        systemPrompt: content.trim(),
+        filePath,
+        category: data.category as string | undefined,
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      errors.push(`${file}: ${msg}`);
+    }
+  }
+
   for (const dir of dirs) {
     if (!fs.existsSync(dir)) continue;
-    const files = fs.readdirSync(dir).filter((f) => f.endsWith('.md'));
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
 
-    for (const file of files) {
-      const filePath = path.join(dir, file);
-      try {
-        const raw = fs.readFileSync(filePath, 'utf-8');
-        const { data, content } = matter(raw);
-        const name: string = (data.name as string) || path.basename(file, '.md');
-        if (seen.has(name)) continue;
-        seen.add(name);
-
-        const rawTools = data.tools;
-        const tools: string[] = Array.isArray(rawTools)
-          ? (rawTools as unknown[]).filter((t): t is string => typeof t === 'string' && ALL_TOOL_NAMES.includes(t))
-          : ALL_TOOL_NAMES;
-
-        agents.push({
-          name,
-          description: (data.description as string) || '',
-          tools,
-          model: data.model as string | undefined,
-          systemPrompt: content.trim(),
-          filePath,
-          category: data.category as string | undefined,
-        });
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
-        errors.push(`${file}: ${msg}`);
+    for (const entry of entries) {
+      if (entry.isFile() && entry.name.endsWith('.md')) {
+        processFile(path.join(dir, entry.name), entry.name);
+      } else if (entry.isDirectory()) {
+        const subDir = path.join(dir, entry.name);
+        const mdPath = path.join(subDir, 'AGENT.md');
+        const skillMdPath = path.join(subDir, 'SKILL.md');
+        if (fs.existsSync(mdPath)) processFile(mdPath, 'AGENT.md');
+        else if (fs.existsSync(skillMdPath)) processFile(skillMdPath, 'SKILL.md');
+        else {
+          const subFiles = fs.readdirSync(subDir).filter((f) => f.endsWith('.md'));
+          for (const f of subFiles) {
+            processFile(path.join(subDir, f), f);
+          }
+        }
       }
     }
   }

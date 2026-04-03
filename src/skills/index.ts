@@ -16,25 +16,49 @@ export function loadAllSkills(): Skill[] {
   const skills: Skill[] = [];
   const seen = new Set<string>();
 
+  function processFile(filePath: string, file: string) {
+    try {
+      const raw = fs.readFileSync(filePath, 'utf-8');
+      const { data, content } = matter(raw);
+      // For SKILL.md we definitely need to use the frontmatter name or directory name
+      let name: string = data.name as string;
+      if (!name) {
+        if (file === 'SKILL.md') name = path.basename(path.dirname(filePath));
+        else name = path.basename(file, '.md');
+      }
+      
+      if (seen.has(name)) return;
+      seen.add(name);
+      skills.push({
+        name,
+        description: (data.description as string) || '',
+        content: content.trim(),
+        tags: (data.tags as string[]) || [],
+        filePath,
+      });
+    } catch {}
+  }
+
   for (const dir of dirs) {
     if (!fs.existsSync(dir)) continue;
-    const files = fs.readdirSync(dir).filter((f) => f.endsWith('.md'));
-    for (const file of files) {
-      const filePath = path.join(dir, file);
-      try {
-        const raw = fs.readFileSync(filePath, 'utf-8');
-        const { data, content } = matter(raw);
-        const name: string = (data.name as string) || path.basename(file, '.md');
-        if (seen.has(name)) continue;
-        seen.add(name);
-        skills.push({
-          name,
-          description: (data.description as string) || '',
-          content: content.trim(),
-          tags: (data.tags as string[]) || [],
-          filePath,
-        });
-      } catch {}
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    
+    for (const entry of entries) {
+      if (entry.isFile() && entry.name.endsWith('.md')) {
+        processFile(path.join(dir, entry.name), entry.name);
+      } else if (entry.isDirectory()) {
+        const subDir = path.join(dir, entry.name);
+        const skillMdPath = path.join(subDir, 'SKILL.md');
+        if (fs.existsSync(skillMdPath)) {
+          processFile(skillMdPath, 'SKILL.md');
+        } else {
+          // optionally check other md files inside the folder
+          const subFiles = fs.readdirSync(subDir).filter(f => f.endsWith('.md'));
+          for (const f of subFiles) {
+             processFile(path.join(subDir, f), f);
+          }
+        }
+      }
     }
   }
   return skills;

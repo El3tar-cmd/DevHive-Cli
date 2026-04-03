@@ -66,6 +66,36 @@ export const writeFileTool: Tool = {
   },
 };
 
+export const editFileTool: Tool = {
+  definition: {
+    type: 'function',
+    function: {
+      name: 'edit_file',
+      description: 'Replace specific text in a file. Very useful for modifying existing files without rewriting them entirely. Target text must exactly match what is in the file.',
+      parameters: {
+        type: 'object',
+        properties: {
+          path: { type: 'string', description: 'File path to edit' },
+          target: { type: 'string', description: 'The exact string representation to be replaced' },
+          replacement: { type: 'string', description: 'The new string to insert in place of the target' },
+        },
+        required: ['path', 'target', 'replacement'],
+      },
+    },
+  },
+  async execute(args) {
+    const filePath = path.resolve(process.cwd(), args.path);
+    if (!fs.existsSync(filePath)) return `❌ File not found: ${args.path}`;
+    let content = fs.readFileSync(filePath, 'utf-8');
+    if (!content.includes(args.target)) {
+      return `❌ Target text not found in ${args.path}. Please make sure the target text matches EXACTLY including whitespace and newlines.`;
+    }
+    content = content.replace(args.target, args.replacement);
+    fs.writeFileSync(filePath, content, 'utf-8');
+    return `✅ Successfully replaced text in ${args.path}`;
+  },
+};
+
 export const listFilesTool: Tool = {
   definition: {
     type: 'function',
