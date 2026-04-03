@@ -4,12 +4,21 @@
 
 ---
 
-## ⚡ Features
+## ⚡ What's New (Latest Updates)
 
-- **Multi-Agent Architecture**: 15+ specialized AI agents, including `orchestrator`, `frontend`, `backend`, `security`, `debugger`, `planner`, and `coder`.
-- **Dynamic Command Palette**: A robust UI featuring autocomplete slash commands (e.g. `/agent`, `/model list`, `/skills`) to easily navigate the tool without leaving your keyboard.
+- **Advanced Recursive Agent Loader**: DevHive can now automatically crawl and load over 100+ nested agents and skill folders (supporting structures like `agents/skill-name/SKILL.md`).
+- **Heavy LLM Optimizations**: Injected `CRITICAL RULES FOR AI` to strictly enforce tool calls and autonomous execution. This ensures massive reasoning models (like `minimax`, `qwen2.5-coder`, and 800b parameters) execute code rapidly without hallucinating, freezing, or stopping mid-task.
+- **Smart `edit_file` Tool**: Replaced legacy heavy file-rewriting with precise line-level string replacement, significantly saving context window tokens and drastically speeding up modifications.
+- **Import Scripts**: Bundled `import-agents.js` to easily migrate your third-party isolated skills or agents directly into the DevHive core.
+- **UI/UX Polish**: Upgraded the CLI visual display with stunning, 53-character beautifully aligned Gold ASCII layouts for an immersive dashboard feel.
+
+---
+
+## 🔥 Features
+
+- **Multi-Agent Architecture**: Comes equipped to handle a massive matrix of custom AI agents. `orchestrator`, `frontend`, `backend`, `security`, and heavily tailored workflows.
+- **Dynamic Command Palette**: A robust UI featuring autocomplete slash commands (e.g. `/agent`, `/model`, `/skills`) to easily navigate the tool without leaving your keyboard.
 - **MCP Integration (Model Context Protocol)**: Store and index knowledge, recommend tools, and interact seamlessly with advanced servers.
-- **Skill Engine**: Dynamically load and inject skills into the AI agents' contexts, giving them contextual superpowers.
 - **Provider Agnostic**: Works perfectly with local **Ollama** models or any other AI backend connected to the interface.
 - **Smart Terminal Environment**: Agent context automatically captures your working directory, date, and local environment references.
 
@@ -36,12 +45,17 @@
    npm install
    ```
 
-3. **Build the CLI:**
+3. **Migrate/Bundle your Custom Agents (Optional):**
+   ```bash
+   node import-agents.js
+   ```
+
+4. **Build the CLI:**
    ```bash
    npm run build
    ```
 
-4. **Link the CLI globally (Optional but recommended):**
+5. **Link the CLI globally (Optional but recommended):**
    ```bash
    npm link
    ```
@@ -65,7 +79,7 @@ DevHive CLI comes with a rich set of built-in commands. You can access the comma
 | Command | Description |
 | :--- | :--- |
 | `/model list` | View all available models |
-| `/model set <name>` | Switch the active AI model (e.g. `llama3.2`) |
+| `/model set <name>` | Switch the active AI model (e.g. `minimax-m2.7`) |
 | `/agent` | Let the system auto-assign the best specialized agent |
 | `/agent <name>` | Explicitly switch to an agent (e.g. `/agent coder`) |
 | `/skills` | Manage, inject, and load special system skills |
@@ -80,15 +94,20 @@ DevHive CLI comes with a rich set of built-in commands. You can access the comma
 
 DevHive consists of several key modules:
 - **`src/ui/`**: Advanced terminal handling, colored output elements, display widgets, and interactive command palettes.
-- **`src/agents/`**: Core definitions and runtime runners for the multi-agent system.
+- **`src/agents/`**: Core definitions, smart caching loaders, and runtime runners handling critical multi-agent tool loops.
+- **`src/tools/`**: Powerful operational tools (Shell execution, Fetch, Directory Mgmt, Fast File Editor).
 - **`src/providers/`**: AI model connections (Ollama streaming proxy, payload parsers).
 - **`src/mcp/`**: Handling interactions with MCP clients and tool calling protocols. 
 
 ---
 
+## 👤 Author
+
+**Abdalrahman Mahmoud**
+- **Email:** abdalrhamn.mahmoud@gmail.com
+- **Profile:** [Facebook](https://www.facebook.com/share/1CMHZog6hZ/)
+- **Company:** [DevHive Agency](https://www.facebook.com/share/1bvbFW6T99/)
+
 ## 📄 License
 
 This project is licensed under the MIT License - feel free to customize and expand DevHive.
-
----
-*Created by [El3tar-cmd](https://github.com/El3tar-cmd).*
