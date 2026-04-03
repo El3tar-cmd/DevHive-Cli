@@ -116,7 +116,12 @@ export async function connectMcp(name: string): Promise<string> {
   if (!serverConfig) return `❌ MCP server "${name}" not found — use /mcp add or /mcp install`;
 
   try {
-    const proc = spawn(serverConfig.command, serverConfig.args, {
+    let cmd = serverConfig.command;
+    if (process.platform === 'win32' && (cmd === 'npx' || cmd === 'npm')) {
+      cmd += '.cmd';
+    }
+
+    const proc = spawn(cmd, serverConfig.args, {
       stdio: ['pipe', 'pipe', 'pipe'],
       env: { ...process.env, ...(serverConfig.env || {}) },
       shell: process.platform === 'win32',
@@ -134,8 +139,20 @@ export async function connectMcp(name: string): Promise<string> {
       callCount: 0,
     };
 
+    proc.on('error', (err) => {
+      console.error(`  [MCP:${name}] Spawn error:`, err.message);
+      const c = connections.get(name);
+      if (c) {
+        c.status = 'error';
+        c.lastError = err.message;
+      }
+    });
+
     proc.stdout!.on('data', (d: Buffer) => handleData(conn, d.toString()));
-    proc.stderr!.on('data', () => {});
+    proc.stderr!.on('data', (d: Buffer) => {
+      // Log stderr for debugging if needed
+      // console.error(`  [MCP:${name}] stderr: ${d.toString()}`);
+    });
     proc.on('exit', (code) => {
       const c = connections.get(name);
       if (c) {

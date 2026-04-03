@@ -14,6 +14,19 @@
 
 ---
 
+## 📸 Screenshots
+
+<p align="center">
+  <img src="assets/banner.png" alt="DevHive CLI Banner" width="45%" />
+  <img src="assets/mcp-store.png" alt="MCP Store Integration" width="45%" />
+</p>
+
+<p align="center">
+  <img src="assets/chat-interaction.png" alt="Agent Problem Solving" width="80%" />
+</p>
+
+---
+
 ## 🔥 Features
 
 - **Multi-Agent Architecture**: Comes equipped to handle a massive matrix of custom AI agents. `orchestrator`, `frontend`, `backend`, `security`, and heavily tailored workflows.
