@@ -119,6 +119,7 @@ export async function connectMcp(name: string): Promise<string> {
     const proc = spawn(serverConfig.command, serverConfig.args, {
       stdio: ['pipe', 'pipe', 'pipe'],
       env: { ...process.env, ...(serverConfig.env || {}) },
+      shell: process.platform === 'win32',
     });
 
     const conn: McpConnection = {

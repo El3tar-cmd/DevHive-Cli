@@ -405,7 +405,21 @@ export async function startChat(options: { agent?: string; session?: string } = 
 
   function updatePaletteFromLine(): void {
     paletteQuery = getPaletteQueryFromLine();
-    paletteItems = COMMAND_COMPLETIONS.filter((c) => c.startsWith(paletteQuery));
+    let candidates = COMMAND_COMPLETIONS;
+
+    // Provide dynamic autocomplete options for skills and agents
+    if (paletteQuery.startsWith('/skills load ') || paletteQuery.startsWith('/skills show ') || paletteQuery.startsWith('/skill load ')) {
+      const prefix = paletteQuery.substring(0, paletteQuery.lastIndexOf(' ') + 1);
+      candidates = loadAllSkills().map((s) => prefix + s.name);
+    } else if (paletteQuery.startsWith('/skills unload ') || paletteQuery.startsWith('/skill unload ')) {
+      const prefix = paletteQuery.substring(0, paletteQuery.lastIndexOf(' ') + 1);
+      candidates = state.session.loadedSkills.map((s) => prefix + s);
+    } else if (paletteQuery.startsWith('/agent switch ') || paletteQuery.startsWith('/agent show ')) {
+      const prefix = paletteQuery.substring(0, paletteQuery.lastIndexOf(' ') + 1);
+      candidates = loadAgents().map((a) => prefix + a.name);
+    }
+
+    paletteItems = candidates.filter((c) => c.startsWith(paletteQuery));
     if (paletteItems.length === 0 && paletteQuery === '/') {
       paletteItems = [...COMMANDS];
     }
@@ -443,13 +457,19 @@ export async function startChat(options: { agent?: string; session?: string } = 
     }
     
     closePalette();
-    // Clear rl line and overwrite it with selected command before executing
-    (rl as any).line = '';
-    (rl as any).cursor = 0;
     
-    await handleCommand(selected);
-    rl.setPrompt(prompt());
+    // Inject the selected command into readline buffer and let the user continue typing
+    // instead of forcing premature execution.
+    readline.cursorTo(process.stdout, 0);
+    readline.clearLine(process.stdout, 0);
+    
+    (rl as any).line = selected + ' ';
+    (rl as any).cursor = (rl as any).line.length;
+    
     rl.prompt();
+    if (typeof (rl as any)._refreshLine === 'function') {
+      (rl as any)._refreshLine();
+    }
   }
 
   // Intercept keystrokes to handle palette navigation without triggering default readline behaviors
@@ -638,10 +658,12 @@ export async function startChat(options: { agent?: string; session?: string } = 
 
         if (!sub || sub === 'info') {
           if (state.currentAgent) {
+            const mcpDefs = getMcpToolDefinitions().map(d => chalk.hex('#F5A623')(d.function.name));
+            const allTools = [...state.currentAgent.tools, ...mcpDefs];
             printSection(`Agent: ${state.currentAgent.name}`);
             console.log(`  ${chalk.dim('Description:')} ${state.currentAgent.description}`);
             console.log(`  ${chalk.dim('Model:')}       ${state.currentAgent.model || chalk.dim('(uses global)')}`);
-            console.log(`  ${chalk.dim('Tools:')}       ${state.currentAgent.tools.join(', ')}`);
+            console.log(`  ${chalk.dim('Tools:')}       ${allTools.join(', ')}`);
             console.log(`  ${chalk.dim('File:')}        ${chalk.dim(state.currentAgent.filePath)}`);
             console.log('');
           } else {
